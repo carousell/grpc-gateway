@@ -86,6 +86,10 @@ type Registry struct {
 	// simpleOperationIDs removes the service prefix from the generated
 	// operationIDs. This risks generating duplicate operationIDs.
 	simpleOperationIDs bool
+
+	// includeUnreferencedTypes if true will generate swagger definitions for all message and enum types,
+	// even those that are not referenced by an RPC method.
+	includeUnreferencedTypes bool
 }
 
 type repeatedFieldSeparator struct {
@@ -522,6 +526,16 @@ func (r *Registry) SetSimpleOperationIDs(use bool) {
 // GetSimpleOperationIDs returns simpleOperationIDs
 func (r *Registry) GetSimpleOperationIDs() bool {
 	return r.simpleOperationIDs
+}
+
+// SetIncludeUnreferencedTypes sets includeUnreferencedTypes
+func (r *Registry) SetIncludeUnreferencedTypes(use bool) {
+	r.includeUnreferencedTypes = use
+}
+
+// GetIncludeUnreferencedTypes returns includeUnreferencedTypes
+func (r *Registry) GetIncludeUnreferencedTypes() bool {
+	return r.includeUnreferencedTypes
 }
 
 // sanitizePackageName replaces unallowed character in package name

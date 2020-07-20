@@ -64,7 +64,7 @@ var wktSchemas = map[string]schemaCore{
 		Format: "double",
 	},
 	".google.protobuf.BoolValue": schemaCore{
-		Type:   "boolean",
+		Type: "boolean",
 	},
 	".google.protobuf.Empty": schemaCore{},
 	".google.protobuf.Struct": schemaCore{
@@ -1183,6 +1183,18 @@ func applyTemplate(p param) (*swaggerObject, error) {
 	// Find all the service's messages and enumerations that are defined (recursively)
 	// and write request, response and other custom (but referenced) types out as definition objects.
 	findServicesMessagesAndEnumerations(p.Services, p.reg, messages, streamingMessages, enums, requestResponseRefs)
+	// If requested, find messages and enumerations that aren't referenced by service methods
+	if p.reg.GetIncludeUnreferencedTypes() {
+		for _, message := range p.Messages {
+			messageName, ok := fullyQualifiedNameToSwaggerName(message.FQMN(), p.reg)
+			if !ok {
+				glog.Errorf("couldn't resolve swagger name for message '%v'", message.FQMN())
+				continue
+			}
+			messages[messageName] = message
+			findNestedMessagesAndEnumerations(message, p.reg, messages, enums)
+		}
+	}
 	renderMessagesAsDefinition(messages, s.Definitions, p.reg, customRefs)
 	renderEnumerationsAsDefinition(enums, s.Definitions, p.reg)
 
